@@ -6,7 +6,7 @@
 /* this is TO simple does not take posistioning, coordinate system or
    the fact that there kan be several active modes at the same og
    different tools */
-struct STATE {
+typedef struct {
     int modal;                  /* M codes */
     int gmode;                  /* G codes */
     int tool;                   /* T ool number */
@@ -14,16 +14,17 @@ struct STATE {
     float x,y,z,a;
     char comment[LINESIZE];
     char line[LINESIZE];                 /* for debuggins */
-};
-
-typedef struct STATE State;
+} state_t;
 
 
-State *make_state(State *init);
 
-void clone_into(State *dest, State *src);
-void init_state(State *s);
+state_t *make_state(void);
 
-void write_statement(State *prev, State *cur, FILE *out);
+void clone_into(state_t *dest, state_t *src);
+void init_state(state_t *s);
+
+int state_equals(state_t *s1, state_t *s2);
+double dist(state_t *s1, state_t *s2);
+void write_statement(state_t *prev, state_t *cur, FILE *out);
 
 #endif /* !STATE_H_ */

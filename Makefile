@@ -5,6 +5,15 @@ LINK := g++
 
 CFLAGS += -Wall
 CFLAGS += -Werror	
+CFLAGS += -pedantic
+CFLAGS += -Wextra
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wstrict-prototypes
+CFLAGS += -Wswitch-enum  #require that all enums are used in switc
+CFLAGS += -lm
+CFLAGS += -std=gnu99
+CFLAGS += -DGNUSOURCE  		#asprintf
+
 
 ifeq ($(debug),1) 
  COMMONFLAGS += -g
@@ -28,11 +37,10 @@ SRCDIR = src
 # Common flags
 #COMMONFLAGS += $(INCLUDES)
 CXXFLAGS += $(COMMONFLAGS)
-CFLAGS += -std=gnu99
 CFLAGS += $(COMMONFLAGS)
 
 EXEC=frostcoder
-OBJS=frostcoder.c state.c
+OBJS=frostcoder.c state.c parser.c
 
 
 BUILD_OBJS =$(addprefix $(BUILDDIR)/, $(addsuffix .o, $(OBJS)))
