@@ -91,7 +91,7 @@ int parse(char *filename, void (*callback)(state_t *)) {
 
     int state_changes = 0;
     /* read line by line */
-    char buf[024];
+    char buf[512];
     char *line = buf;
     size_t linesize = 0;
     int res = 0;

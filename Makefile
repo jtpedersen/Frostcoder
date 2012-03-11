@@ -66,4 +66,4 @@ egg:  $(BUILD_OBJS) $(BUILDDIR)/eggcoder.c.o
 	$(LINKLINE) $(BUILDDIR)/eggcoder.c.o -o$(BINDIR)/eggcoder
 
 clean:
-	rm -f $(BUILDDIR)/* $(BINDIR)/* $(SRCDIR)/*~
+	rm -f $(BUILDDIR)/* $(BINDIR)/eggcoder $(BINDIR)/frostcoder $(SRCDIR)/*~
