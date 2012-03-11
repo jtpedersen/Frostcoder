@@ -24,7 +24,9 @@ void write_header(FILE *f) {
 
 
 /* write the required code to change to the new state */
-void write_statement(state_t *cur, state_t *new, FILE *out) {
+/* FIXME rewirite to not use this redundant code */
+static
+void write_frostatement(state_t *cur, state_t *new, FILE *out) {
     char buf[512];
     int idx = 0;
     if (state_equals(cur, new)) {
@@ -83,7 +85,7 @@ static state_t *prev;
 static FILE *output;
 static
 void handle_nextstate(state_t *next) {
-    write_statement(prev, next, output);
+    write_frostatement(prev, next, output);
     free(prev);
     prev = next;
 }

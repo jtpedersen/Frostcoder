@@ -39,14 +39,13 @@ SRCDIR = src
 CXXFLAGS += $(COMMONFLAGS)
 CFLAGS += $(COMMONFLAGS)
 
-EXEC=frostcoder
-OBJS=frostcoder.c state.c parser.c
+OBJS=state.c parser.c
+EXECS=frostcoder.c eggcoder.c
 
-
-BUILD_OBJS =$(addprefix $(BUILDDIR)/, $(addsuffix .o, $(OBJS)))
+BUILD_OBJS=$(addprefix $(BUILDDIR)/, $(addsuffix .o, $(OBJS)))
 LINKLINE = $(LINK) $(BUILD_OBJS) 
 
-all: main
+all: frost egg
 
 init:
 	mkdir -p $(BUILDDIR)
@@ -60,8 +59,11 @@ $(BUILDDIR)/%.c.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
 $(BUILDDIR)/%.cpp.o: $(SRCDIR)/%.cpp $(SRCDIR)/%.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-main:  $(BUILD_OBJS) 
-	$(LINKLINE) -o$(BINDIR)/$(EXEC)
+frost:  $(BUILD_OBJS) $(BUILDDIR)/frostcoder.c.o
+	$(LINKLINE) $(BUILDDIR)/frostcoder.c.o -o$(BINDIR)/frostcoder
+
+egg:  $(BUILD_OBJS) $(BUILDDIR)/eggcoder.c.o
+	$(LINKLINE) $(BUILDDIR)/eggcoder.c.o -o$(BINDIR)/eggcoder
 
 clean:
-	rm -f $(BUILDDIR)/* $(BINDIR)/$(EXEC) $(SRCDIR)/*~
+	rm -f $(BUILDDIR)/* $(BINDIR)/* $(SRCDIR)/*~
