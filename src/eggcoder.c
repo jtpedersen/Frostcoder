@@ -51,7 +51,7 @@ void read_shape(const char *filename) {
             fprintf(stderr, "AARGH out of range\n");
             abort();
         }
-        printf("%f %f from %s\n", x,z, buf); 
+        /* printf("%f %f from %s\n", x,z, buf);  */
     } 
     points = idx;
     if (fclose(f)) {
@@ -73,7 +73,7 @@ double interpolatez(double x) {
     assert(gt > 0);
     
     double diff = Xs[gt] - Xs[gt-1];
-    double offset = x - Xs[gt-1];
+    double offset = Xs[gt] - x;
     
     double ratio = offset /diff;
     assert(ratio <= 1 && ratio >= 0);
@@ -87,7 +87,7 @@ static FILE *output;
 static
 void handle_nextstate(state_t *next) {
     /* interpolate to a new an eggciting z coordinate */
-    next->z += interpolatez(next->x);
+    next->z = next->z + interpolatez(next->x);
     /* assume sphere with a center at  */
     write_statement(prev, next, output);
     free(prev);

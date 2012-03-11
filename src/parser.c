@@ -49,6 +49,7 @@ int handle_word(state_t *state, char *word) {
 }
 
 state_t *handle_line(char *line, state_t *prev) {
+    /* printf("look at: %s \n", line); */
     state_t *next  = malloc(sizeof(state_t));
     clone_into(next, prev);
     int size = strlen(line);
@@ -76,6 +77,7 @@ state_t *handle_line(char *line, state_t *prev) {
         word = strtok(NULL, " ");
         
     }
+
     return next;
 }
 
@@ -97,7 +99,10 @@ int parse(char *filename, void (*callback)(state_t *)) {
     int res = 0;
     while ( (res = getline(&line, &linesize, input)) > 0 ) {
         state_t *cur  = handle_line(line, prev);
-        callback(cur);
+        state_t *next = make_state();
+        clone_into(next, cur);
+        callback(next);
+        free(prev);
         prev = cur;
         state_changes++;
     }

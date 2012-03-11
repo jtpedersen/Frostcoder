@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <math.h>
 
 
@@ -9,6 +10,7 @@
 state_t *make_state(void) {
     state_t *res = (state_t *) malloc(sizeof(state_t));
     if (NULL == res) { perror("no mem for you");}
+    init_state(res);
     return res;
 }
 
@@ -36,6 +38,7 @@ void clone_into(state_t *dst, state_t *src){
         /* clear comments */
         memset( dst->line,'\0', LINESIZE);
         memset( dst->comment,'\0', LINESIZE);
+        assert(state_equals(src, dst));
     }
 
 }
@@ -46,6 +49,7 @@ int state_equals(state_t *s1, state_t *s2) {
         s1->x == s2->x &&
         s1->y == s2->y &&
         s1->z == s2->z &&
+        s1->a == s2->a &&
         s1->tool == s2->tool &&
         s1->feedrate == s2->feedrate &&
         s1->gmode == s2->gmode;
