@@ -1,5 +1,6 @@
 #ifndef STATE_H_
 #define STATE_H_
+#include <stdio.h>
 
 #define LINESIZE 512            /* yeah way to make it :S */
 
@@ -19,9 +20,10 @@ typedef struct {
 
 
 state_t *make_state(void);
-
 void clone_into(state_t *dest, state_t *src);
+state_t *copy_state(state_t *s);
 void init_state(state_t *s);
+void write_header(FILE *f);
 
 int state_equals(state_t *s1, state_t *s2);
 double dist(state_t *s1, state_t *s2);

@@ -23,6 +23,12 @@ void init_state(state_t *s) {
     memset( s->comment,'\0', LINESIZE);
 }
 
+state_t *copy_state(state_t *s) {
+    state_t *res = make_state();
+    clone_into(res, s);
+    return res;
+}
+
 void clone_into(state_t *dst, state_t *src){
     if (NULL == src) {
         init_state(dst);
@@ -62,6 +68,16 @@ double dist(state_t *s1, state_t *s2) {
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
+void write_header(FILE *f) {
+    /* FIXME add A params */
+    fprintf(f, "#1 = 0 (X offset)\n");
+    fprintf(f, "#2 = 0 (Y offset)\n");
+    fprintf(f, "#3 = 1.0 (XY scale offset)\n");
+    fprintf(f, "#4 = 1.0 (Frostrate )\n");
+    fprintf(f, "#5 = 1.0 (Feed scale)\n");
+}
+
+
 /* write the required code to change to the new state */
 void write_statement(state_t *cur, state_t *new, FILE *out) {
     char buf[512];
@@ -71,7 +87,7 @@ void write_statement(state_t *cur, state_t *new, FILE *out) {
         if (new->comment[0] != '\0') {
             fprintf(out , "%s\n", new->comment);
         } else {
-            fprintf(stderr, "statement with no effect: %s", new->line);
+            fprintf(stderr, "statement with no effect: '%s'\n", new->line);
         }
         return;
     }

@@ -14,14 +14,7 @@ void usage(char **args) {
     printf("\n\nEggcode will generate paramerized gcode to map gcode on to an egg. WILL rewirite Y to A\n");
 }
 
-static
-void write_header(FILE *f) {
-    fprintf(f, "#1 = 0 (X offset)\n");
-    fprintf(f, "#2 = 0 (Y offset)\n");
-    fprintf(f, "#3 = 1.0 (XY scale offset)\n");
-    fprintf(f, "#4 = 1.0 (Frostrate )\n");
-    fprintf(f, "#5 = 1.0 (Feed scale)\n");
-}
+
 static int points;
 double *Xs, *Zs;
 

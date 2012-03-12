@@ -39,13 +39,13 @@ SRCDIR = src
 CXXFLAGS += $(COMMONFLAGS)
 CFLAGS += $(COMMONFLAGS)
 
-OBJS=state.c parser.c
-EXECS=frostcoder.c eggcoder.c
+OBJS=state.c parser.c vec3.c
+EXECS=frostcoder.c eggcoder.c splitter.c
 
 BUILD_OBJS=$(addprefix $(BUILDDIR)/, $(addsuffix .o, $(OBJS)))
 LINKLINE = $(LINK) $(BUILD_OBJS) 
 
-all: frost egg
+all: frost egg split
 
 init:
 	mkdir -p $(BUILDDIR)
@@ -65,5 +65,9 @@ frost:  $(BUILD_OBJS) $(BUILDDIR)/frostcoder.c.o
 egg:  $(BUILD_OBJS) $(BUILDDIR)/eggcoder.c.o
 	$(LINKLINE) $(BUILDDIR)/eggcoder.c.o -o$(BINDIR)/eggcoder
 
+split:  $(BUILD_OBJS) $(BUILDDIR)/splitter.c.o
+	$(LINKLINE) $(BUILDDIR)/splitter.c.o -o$(BINDIR)/splitter
+
+
 clean:
-	rm -f $(BUILDDIR)/* $(BINDIR)/eggcoder $(BINDIR)/frostcoder $(SRCDIR)/*~
+	rm -f $(BUILDDIR)/* $(BINDIR)/eggcoder $(BINDIR)/frostcoder $(BINDIR)/splitter $(SRCDIR)/*~

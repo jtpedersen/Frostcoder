@@ -14,7 +14,7 @@ void usage(char **args) {
 }
 
 static
-void write_header(FILE *f) {
+void frost_header(FILE *f) {
     fprintf(f, "#1 = 0 (X offset)\n");
     fprintf(f, "#2 = 0 (Y offset)\n");
     fprintf(f, "#3 = 1.0 (XY scale offset)\n");
@@ -103,7 +103,7 @@ int main(int argc, char **args) {
     }
     prev = malloc(sizeof(state_t));
     init_state(prev);
-    write_header(output);
+    frost_header(output);
 
     parse(infile, handle_nextstate);
 
