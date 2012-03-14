@@ -1,9 +1,19 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 /* #include "util.h" */
 #include "vec3.h"
+
+vec3 *make_vec3() {
+    vec3 *tmp = malloc(sizeof(vec3));
+    if (NULL == tmp) {
+        perror("could not allocate vec3\n");
+        abort();
+    }
+    return tmp;
+}
 
 
 extern inline

@@ -15,5 +15,7 @@ vec3 reflect(vec3 v, vec3 n);
 vec3 cross(vec3 u, vec3 v);
 double length(vec3 v);
 void print_vec3(vec3 v);
+vec3 *make_vec3(void);
+
 
 #endif /* !VEC3_H_ */
