@@ -76,9 +76,10 @@ double interpolatez(double x, double y) {
     }
 
     vec3 *data = data_grid.data;
+    int stride = data_grid.cols;
     int row = -1, col = -1;
     /* find the col */
-    for(int i = 0; i < data_grid.cols; i++) {
+    for(int i = 0; i < stride; i++) {
         if (x <= data[i].x)  {
             col = i;
             break;
@@ -88,7 +89,7 @@ double interpolatez(double x, double y) {
     if (col < 1) return 0;
     /* find the row */
     for(int j = 0; j < data_grid.rows; j++) {
-        if (y <= data[j * data_grid.cols + row].y)  {
+        if (y <= data[(j * stride) + col].y)  {
             row = j;
             break;
         }
@@ -96,27 +97,32 @@ double interpolatez(double x, double y) {
     /* assume 0 outside sample area */
     if (row < 1) return 0;
     
-    
-
     /* 4 points to be interpolated
               N_ratio
           p0 -- p1
           |     |  
           p2 -- p3
                S_ratio
-          
        p3 is at col,row
      */
+    vec3 p0 = data[(row-1) * stride + col-1];
+    vec3 p1 = data[(row-1) * stride + col  ];
+    vec3 p2 = data[(row)   * stride + col-1];
+    vec3 p3 = data[(row)   * stride + col  ];
 
-    vec3 p0 = data[(row-1) * data_grid.cols + col-1];
-    vec3 p1 = data[(row-1) * data_grid.cols + col  ];
-    vec3 p2 = data[(row)   * data_grid.cols + col-1];
-    vec3 p3 = data[(row)   * data_grid.cols + col  ];
+    assert(p0.x <= x && p1.x >= x);
+    assert(p2.x <= x && p3.x >= x);
+
+    assert(p0.y <= y && p2.y >= y);
+    assert(p1.y <= y && p3.y >= y);
+
 
     /* ratio between p0/p1 */
     double N_ratio = (p1.x - x) / (p1.x - p0.x);
+    assert(N_ratio >= 0 && N_ratio <= 1);
     /* ratio between p2/p3 */
     double S_ratio = (p2.x - x) / (p2.x - p3.x);
+    assert(S_ratio >= 0 && S_ratio <= 1);
 
     /* interpolate linearly on x using N,S ratio to obtain two new points */
     vec3 n_pt = add(scale(p0, N_ratio), scale(p1, 1.0 - N_ratio));
@@ -124,7 +130,8 @@ double interpolatez(double x, double y) {
 
     /* interpolate on the new points using y  */
     double ratio = (n_pt.y - y ) / (n_pt.y - s_pt.y);
-    double res = s_pt.z * ratio + (1.0 - ratio) * n_pt.z;
+    assert(ratio >= 0 && ratio <= 1);
+    double res = n_pt.z * ratio + (1.0 - ratio) * s_pt.z;
     return res;
 }
 
