@@ -43,10 +43,6 @@ void read_file(char *data_file) {
         perror("Could not allocate mem for data\n");
         abort();
     }
-    /* int c; */
-    /* while(EOF != (c = fgetc(f))) { */
-    /*     putchar(c); */
-    /* } */
 
     vec3 *tmp = make_vec3();
     for(int j = 0; j < data_grid.rows; j++) {
@@ -71,63 +67,64 @@ void read_file(char *data_file) {
     fclose(f);
 }
 
-static double *Xs, *Zs;
-static int points;
-
-static __attribute__((unused))
-void read_shape(const char *filename) {
-    const size_t max_points = 256;
-    Xs = malloc(sizeof(double) * max_points);
-    Zs = malloc(sizeof(double) * max_points);
-    if (NULL == Xs || NULL == Zs) {
-        perror("no mem");
-    }
-    FILE *f = fopen(filename, "r");
-    if (NULL == f) {perror("read shape\n"); abort();}
-    unsigned int idx = 0;
-    char buf[512];
-    double x = 0, z = 0;
-    while(NULL != fgets(buf, 512, f) ) {
-        if ( 2 != sscanf(buf, "%lf %lf", &x, &z)) {
-            fprintf(stderr, "not correct data\n");
-        };
-        Xs[idx] = x;
-        Zs[idx] = z;
-        if(idx>1)               
-            assert( Xs[idx-1] <= Xs[idx]);
-        idx++;
-        if (idx == max_points) {
-            fprintf(stderr, "AARGH out of range\n");
-            abort();
-        }
-        /* printf("%f %f from %s\n", x,z, buf);  */
-    } 
-    points = idx;
-    if (fclose(f)) {
-        perror("read shape\n");
-        abort();
-    }
-}
 
 /* just linear interpolation */
 static
-double interpolatez(double x) {
-    int gt = -1;
-    for(int i = 0; i < points; i++) {
-        if (x <= Xs[i])  {
-            gt = i;
+double interpolatez(double x, double y) {
+    if (verbose > 2) {
+        printf("get val for (%f,%f)\n", x,y);
+    }
+
+    vec3 *data = data_grid.data;
+    int row = -1, col = -1;
+    /* find the col */
+    for(int i = 0; i < data_grid.cols; i++) {
+        if (x <= data[i].x)  {
+            col = i;
             break;
         }
     }
-    assert(gt > 0);
+    /* assume 0 outside sample area */
+    if (col < 1) return 0;
+    /* find the row */
+    for(int j = 0; j < data_grid.rows; j++) {
+        if (y <= data[j * data_grid.cols + row].y)  {
+            row = j;
+            break;
+        }
+    }
+    /* assume 0 outside sample area */
+    if (row < 1) return 0;
     
-    double diff = Xs[gt] - Xs[gt-1];
-    double offset = Xs[gt] - x;
     
-    double ratio = offset /diff;
-    assert(ratio <= 1 && ratio >= 0);
-    
-    double res = ratio * Zs[gt-1] +  (1.0-ratio) * Zs[gt];
+
+    /* 4 points to be interpolated
+              N_ratio
+          p0 -- p1
+          |     |  
+          p2 -- p3
+               S_ratio
+          
+       p3 is at col,row
+     */
+
+    vec3 p0 = data[(row-1) * data_grid.cols + col-1];
+    vec3 p1 = data[(row-1) * data_grid.cols + col  ];
+    vec3 p2 = data[(row)   * data_grid.cols + col-1];
+    vec3 p3 = data[(row)   * data_grid.cols + col  ];
+
+    /* ratio between p0/p1 */
+    double N_ratio = (p1.x - x) / (p1.x - p0.x);
+    /* ratio between p2/p3 */
+    double S_ratio = (p2.x - x) / (p2.x - p3.x);
+
+    /* interpolate linearly on x using N,S ratio to obtain two new points */
+    vec3 n_pt = add(scale(p0, N_ratio), scale(p1, 1.0 - N_ratio));
+    vec3 s_pt = add(scale(p2, S_ratio), scale(p3, 1.0 - S_ratio));
+
+    /* interpolate on the new points using y  */
+    double ratio = (n_pt.y - y ) / (n_pt.y - s_pt.y);
+    double res = n_pt.z * ratio + (1.0 - ratio) * s_pt.z;
     return res;
 }
 
@@ -136,7 +133,7 @@ static FILE *output;
 static
 void handle_nextstate(state_t *next) {
     /* interpolate to a new an eggciting z coordinate */
-    next->z = next->z + interpolatez(next->x);
+    next->z = next->z + interpolatez(next->x, next->y);
     /* assume sphere with a center at  */
     write_statement(prev, next, output);
     free(prev);
