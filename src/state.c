@@ -69,14 +69,14 @@ double dist(state_t *s1, state_t *s2) {
 }
 
 void write_header(FILE *f) {
-    /* FIXME add A params */
     fprintf(f, "#1 = 0 (X offset)\n");
     fprintf(f, "#2 = 0 (Y offset)\n");
-    fprintf(f, "#3 = 1.0 (XY scale offset)\n");
-    fprintf(f, "#4 = 1.0 (Frostrate )\n");
+    fprintf(f, "#3 = 1.0 (XY scale )\n");
+    fprintf(f, "#4 = 1.0 (A scale )\n");
     fprintf(f, "#5 = 1.0 (Feed scale)\n");
 }
 
+static int parametrize = 0;
 
 /* write the required code to change to the new state */
 void write_statement(state_t *cur, state_t *new, FILE *out) {
@@ -99,12 +99,19 @@ void write_statement(state_t *cur, state_t *new, FILE *out) {
         /* it has to be some G thingy */
         idx += sprintf(buf, "G%d ", new->gmode);
         if (cur->x != new->x) {
-            idx += sprintf(buf + idx, "X[%f*#3+#1]  ", new->x);
+            if (parametrize) 
+                idx += sprintf(buf + idx, "X[%f*#3+#1] ", new->x);
+            else
+                idx += sprintf(buf + idx, "X%f ", new->x);
         }
         if (cur->y != new->y) {
-            idx += sprintf(buf + idx, "Y[%f*#3+#2] ", new->y);
+            if (parametrize)
+                idx += sprintf(buf + idx, "Y[%f*#3+#2] ", new->y);
+            else
+                idx += sprintf(buf + idx, "Y%f ", new->y);
         }
         if (cur->z != new->z) {
+            /* FIXME parametrize */
             idx += sprintf(buf + idx, "Z%f ", new->z);
         }
         if (cur->a != new->a) {
@@ -112,7 +119,10 @@ void write_statement(state_t *cur, state_t *new, FILE *out) {
         } 
 
         if (cur->feedrate != new->feedrate) {
-            idx += sprintf(buf + idx, "F[%f*#5] ", new->feedrate);
+            if (parametrize)
+                idx += sprintf(buf + idx, "F[%f*#5] ", new->feedrate);
+            else
+                idx += sprintf(buf + idx, "F%f ", new->feedrate);
         }
 
         if (new->comment[0] != '\0') {

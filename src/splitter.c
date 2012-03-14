@@ -22,7 +22,7 @@ vec3 state_to_vec(state_t *s) {
     return res;
 }
 
-static double max_dist = .40;
+static double max_dist = .4;
 
 static state_t *prev;
 static FILE *output;

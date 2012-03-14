@@ -8,6 +8,8 @@
 
 #include "parser.h"
 
+static int line_number = 0;
+
 
 /* if return < 0 there is an error, else everything is dandy*/
 int handle_word(state_t *state, char *word) {
@@ -38,17 +40,22 @@ int handle_word(state_t *state, char *word) {
     case 'Z':
         state->z = atof(val);
         break;
+    case '#':
+        printf("ignore parameter on line %d\n", line_number);
+        return 0;
     case '\n':
     case ' ':
         /* empty line */
         break;
     default:
-        fprintf(stderr, "unknown g-code: %s\n", word);
+        fprintf(stderr, "on line %d\nunknown g-code: %s\n", line_number, word);
+        return 0;
     }
     return 1;
 }
 
 state_t *handle_line(char *line, state_t *prev) {
+    line_number++;
     /* printf("look at: %s \n", line); */
     state_t *next  = malloc(sizeof(state_t));
     clone_into(next, prev);
@@ -72,7 +79,10 @@ state_t *handle_line(char *line, state_t *prev) {
         if (incomment) {
             comment_lenght += sprintf(next->comment +  comment_lenght, "%s ", word);
         } else {
-            handle_word(next, word);
+            if ( !handle_word(next, word)) {
+                printf("skipping rest of line %d\n", line_number);
+                break;
+            }
         }
         word = strtok(NULL, " ");
         

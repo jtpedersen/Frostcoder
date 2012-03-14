@@ -49,7 +49,7 @@ void read_file(char *data_file) {
         for(int i = 0; i < data_grid.cols; i++) {
             unsigned int idx = j*data_grid.cols + i;
             assert(idx < data_size);
-            printf("data for %d(%d,%d)\n", idx, i, j);
+            /* printf("data for %d(%d,%d)\n", idx, i, j); */
             char buf[512];
             char *cptr = fgets(buf, 512, f);
             assert(NULL != cptr);
@@ -124,7 +124,7 @@ double interpolatez(double x, double y) {
 
     /* interpolate on the new points using y  */
     double ratio = (n_pt.y - y ) / (n_pt.y - s_pt.y);
-    double res = n_pt.z * ratio + (1.0 - ratio) * s_pt.z;
+    double res = s_pt.z * ratio + (1.0 - ratio) * n_pt.z;
     return res;
 }
 
@@ -183,7 +183,7 @@ int main(int argc, char **args) {
     if (NULL == outfile)  {
         output = stdout;
     } else {
-        output = fopen(args[2], "w");
+        output = fopen(outfile, "w");
         if (output == NULL) {
             perror("unknown open file error");
             abort();
