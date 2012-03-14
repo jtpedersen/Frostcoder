@@ -1,0 +1,19 @@
+F100
+
+G1 X0 Y0
+
+G1 X10 Y10
+
+G1 X5 Y5
+
+G1 X0 Y10
+
+G1 X10 Y0
+
+(Footer)
+M5
+G00 X0.0000 Y0.0000
+M2
+(Using default footer. To add your own footer create file "footer" in the output dir.)
+(end)
+%

@@ -132,6 +132,7 @@ double interpolatez(double x, double y) {
     double ratio = (n_pt.y - y ) / (n_pt.y - s_pt.y);
     assert(ratio >= 0 && ratio <= 1);
     double res = n_pt.z * ratio + (1.0 - ratio) * s_pt.z;
+
     return res;
 }
 
