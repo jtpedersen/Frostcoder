@@ -96,7 +96,9 @@ double interpolatez(double x, double y) {
     }
     /* assume 0 outside sample area */
     if (row < 1) return 0;
-    
+
+    fprintf(stderr, "got %dx%d\n", col, row);
+
     /* 4 points to be interpolated
               N_ratio
           p0 -- p1
@@ -118,22 +120,24 @@ double interpolatez(double x, double y) {
 
 
     /* ratio between p0/p1 */
-    double N_ratio = (p1.x - x) / (p1.x - p0.x);
+    double N_ratio = (x - p0.x) / (p1.x - p0.x);
     assert(N_ratio >= 0 && N_ratio <= 1);
     /* ratio between p2/p3 */
-    double S_ratio = (p2.x - x) / (p2.x - p3.x);
+    double S_ratio = (x - p2.x) / (p3.x - p2.x);
     assert(S_ratio >= 0 && S_ratio <= 1);
 
     /* interpolate linearly on x using N,S ratio to obtain two new points */
-    vec3 n_pt = add(scale(p0, N_ratio), scale(p1, 1.0 - N_ratio));
-    vec3 s_pt = add(scale(p2, S_ratio), scale(p3, 1.0 - S_ratio));
+    vec3 n_pt = add(scale(p1, N_ratio), scale(p0, 1.0 - N_ratio));
+    vec3 s_pt = add(scale(p3, S_ratio), scale(p2, 1.0 - S_ratio));
+
 
     /* interpolate on the new points using y  */
-    double ratio = (n_pt.y - y ) / (n_pt.y - s_pt.y);
+    double ratio = (y - n_pt.y ) / (s_pt.y - n_pt.y);
     assert(ratio >= 0 && ratio <= 1);
     double res = n_pt.z * ratio + (1.0 - ratio) * s_pt.z;
 
     return res;
+
 }
 
 static state_t *prev;
@@ -142,6 +146,8 @@ static
 void handle_nextstate(state_t *next) {
     /* interpolate to a new an eggciting z coordinate */
     next->z = next->z + interpolatez(next->x, next->y);
+    /* printf("%f %f %f\n", next->x, next->y, next->z); */
+
     /* assume sphere with a center at  */
     write_statement(prev, next, output);
     free(prev);
