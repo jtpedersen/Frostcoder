@@ -130,7 +130,6 @@ double interpolatez(double x, double y) {
     vec3 n_pt = add(scale(p1, N_ratio), scale(p0, 1.0 - N_ratio));
     vec3 s_pt = add(scale(p3, S_ratio), scale(p2, 1.0 - S_ratio));
 
-
     /* interpolate on the new points using y  */
     double ratio = (y - n_pt.y ) / (s_pt.y - n_pt.y);
     assert(ratio >= 0 && ratio <= 1);
